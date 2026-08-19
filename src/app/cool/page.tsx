@@ -15,7 +15,7 @@ export default function Kewl() {
 	One of the best things that's happened to me during my time at GT was joining CS2110 as a TA. <br />
 	I've met a lot of great people and it made my time as a student feel special.
 	</p>
-	<Image src={dunkGif} alt="" />
+	<Image src={dunkGif} alt="" unoptimized />
     </div>
   );
 }
