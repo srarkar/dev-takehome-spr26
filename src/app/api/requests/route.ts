@@ -1,3 +1,4 @@
+import { ObjectId } from "mongodb";
 import clientPromise from "@/lib/mongodb";
 import { HTTP_STATUS_CODE, ResponseType } from "@/lib/types/apiResponse";
 import { ServerResponseBuilder } from "@/lib/builders/serverResponseBuilder";
@@ -106,7 +107,7 @@ export async function PATCH (request: Request) {
 		  { $set: {status: inputStatus, lastEditedDate: now } }
 	  )	
 
-	  if (result.matchedCouht == 0) {
+	  if (result.matchedCount == 0) {
 		  throw new InputException("No matching request found for given id");
 	  }
 	   
