@@ -101,16 +101,17 @@ export async function PATCH (request: Request) {
 	  const db = client.db();
 	
 	  const now = new Date();
-	  await db.collection("requests").updateOne(
-		  {_id: inputID},
-		  { $set: {status: inputStatus, lastEditedDate: now} }
+	  const result = await db.collection("requests").updateOne(
+		  {_id: new ObjectId(inputID) },
+		  { $set: {status: inputStatus, lastEditedDate: now } }
 	  )	
 
-	  return new Response(JSON.stringify(requests), {
-      		   status: HTTP_STATUS_CODE.OK,
-                   headers: {
-	             "Content-Type": "application/json" },
-    		   });
+	  if (result.matchedCouht == 0) {
+		  throw new InputException("No matching request found for given id");
+	  }
+	   
+	  return new ServerResponseBuilder(ResponseType.SUCCESS).build();
+
 	} catch (err) {
 	  if (err instanceof InputException) {
 		  return new ServerResponseBuilder(ResponseType.INVALID_INPUT).build();
