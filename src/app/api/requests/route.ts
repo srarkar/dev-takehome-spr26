@@ -2,7 +2,7 @@ import clientPromise from "@/lib/mongodb";
 import { HTTP_STATUS_CODE, ResponseType } from "@/lib/types/apiResponse";
 import { ServerResponseBuilder } from "@/lib/builders/serverResponseBuilder";
 import { InputException } from "@/lib/errors/inputExceptions";
-import { PAGINATION_PAGE_SIZE } from "@/lib/constants";
+import { PAGINATION_PAGE_SIZE } from "@/lib/constants/config.ts"
 
 export async function PUT(request: Request) {
   try {
