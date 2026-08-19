@@ -89,11 +89,22 @@ export async function PATCH (request: Request) {
 	try {
 	  const body = await request.json();
 
-	  const id = body?.id?.trim();
-	  const status = body?.status?.trim();
+	  const inputID = body?.id?.trim();
+	  const inputStatus = body?.status?.trim();
 
-
-
+	  
+	  if (!inputID || !inputStatus) {
+	    throw new InputException("id and status must be non-empty strings");
+	  }
+	
+	  const client = await clientPromise;
+	  const db = client.db();
+	
+	  const now = new Date();
+	  db.collection("requests").updateOne(
+		  {_id: inputID},
+		  { $set: {status: inputStatus}, {lastEditedDate: now} }
+	  )	
 
 	} catch (err) {
 	  if (err instanceof InputException) {
