@@ -5,71 +5,80 @@ import { InputException } from "@/lib/errors/inputExceptions";
 import { PAGINATION_PAGE_SIZE } from "@/lib/constants";
 
 export async function PUT(request: Request) {
-	try {
-		const body = await request.json();
+  try {
+    const body = await request.json();
 
-		// validate fields
-		if (
-			!body || typeof body.requestorName !== "string" || 
-			!body.requestorName.trim() || typeof body.itemRequested !== "string" || 
-			!body.itemRequested.trim()
-		) {
-			throw new InputException("Invalid schema: requestorName and itemRequested are both required strings");
-		}
+    const requestorName = body?.requestorName?.trim();
+    const itemRequested = body?.itemRequested?.trim();
 
-		const client = await clientPromise;
-		const db = client.db();
+    // Field Length Validation
+    if (
+      !requestorName ||
+      requestorName.length < 3 ||
+      requestorName.length > 30 ||
+      !itemRequested ||
+      itemRequested.length < 2 ||
+      itemRequested.length > 100
+    ) {
+      throw new InputException("Invalid name or item length requirements.");
+    }
 
-		const newRequest {
-			requestorName: body.requestorName.trim(),
-			itemRequested: body.itemRequested.trim(),
-			status: "pending",
-			createdAt: new Date(),
-			updatedAt new Date(),
-		};
+    const client = await clientPromise;
+    const db = client.db();
 
-		const result = await db.collection("requests").insertOne(newRequest);
+    const now = new Date();
+    const newRequest = {
+      requestorName,
+      itemRequested,
+      status: "pending",
+      createdAt: now,
+      lastEditedDate: now,
+    };
 
-		return new Response(
-			JSON.stringify({ _id: result.insertedId, ...newRequest }),
-			{
-				status: HTTP_STATUS_CODE.CREATED,
-				headers: {"Content-Type": "application/json" },
-			}
-		);
-	} catch (err) {
-		if (err instanceOf InputException) {
-			return new ServerResponseBuilder(ResponseType.INVALID_INPUT).build();
-		}
-		return new ServerResponseBuilder(ResponseType.UNKNOWN_ERROR).build();
-	}
+    const result = await db.collection("requests").insertOne(newRequest);
+
+    return new Response(
+      JSON.stringify({ _id: result.insertedId, ...newRequest }),
+      {
+        status: HTTP_STATUS_CODE.CREATED,
+        headers: { "Content-Type": "application/json" },
+      }
+    );
+  } catch (e) {
+    if (e instanceof InputException) {
+      return new ServerResponseBuilder(ResponseType.INVALID_INPUT).build();
+    }
+    return new ServerResponseBuilder(ResponseType.UNKNOWN_ERROR).build();
+  }
 }
 
 export async function GET(request: Request) {
-	try {
-		const url = new URL(request.url);
-		const pageParam = url.searchParams.get("page");
-			
-		const page = pageParam ? Math.max(1, parseInt(pageParam, 10) || 1) : 1;
-   		const pageSize = typeof PAGINATION_PAGE_SIZE === "number" ? PAGINATION_PAGE_SIZE : 10;
+  try {
+    const url = new URL(request.url);
+    const pageParam = url.searchParams.get("page");
 
-		const client = await clientPromise;
-		const db = client.db();
+    const page = pageParam ? Math.max(1, parseInt(pageParam, 10) || 1) : 1;
+    const pageSize = typeof PAGINATION_PAGE_SIZE === "number" ? PAGINATION_PAGE_SIZE : 10;
 
-		const requests = await db.collection("requests").find({}).sort( {createdAt: -1} ).skip((page - 1) * pageSize)
-								.limit(pageSize).toArray();
+    const client = await clientPromise;
+    const db = client.db();
 
-		return new Response(JSON.stringify(requests), {
-			status: HTTP_STATUS_CODE.OK,
-			headers: {"Content-Type", "application/json"},
-		});
+    const requests = await db
+      .collection("requests")
+      .find({})
+      .sort({ createdAt: -1 })
+      .skip((page - 1) * pageSize)
+      .limit(pageSize)
+      .toArray();
 
-	} catch (err) {
-		if (err instanceOf InputException) {
-			return new ServerResponseBuilder(ResponseType.INVALID_INPUT).build();
-		}
-		return new ServerResponseBuilder(ResponseType.UNKNOWN_ERROR).build();
-	}
+    return new Response(JSON.stringify(requests), {
+      status: HTTP_STATUS_CODE.OK,
+      headers: { "Content-Type": "application/json" },
+    });
+  } catch (e) {
+    if (e instanceof InputException) {
+      return new ServerResponseBuilder(ResponseType.INVALID_INPUT).build();
+    }
+    return new ServerResponseBuilder(ResponseType.UNKNOWN_ERROR).build();
+  }
 }
-
-
