@@ -73,12 +73,33 @@ export async function GET(request: Request) {
 
     return new Response(JSON.stringify(requests), {
       status: HTTP_STATUS_CODE.OK,
-      headers: { "Content-Type": "application/json" },
+      headers: {
+	      "Content-Type": "application/json" },
     });
-  } catch (e) {
-    if (e instanceof InputException) {
+  } catch (err) {
+    if (err instanceof InputException) {
       return new ServerResponseBuilder(ResponseType.INVALID_INPUT).build();
     }
     return new ServerResponseBuilder(ResponseType.UNKNOWN_ERROR).build();
   }
 }
+
+
+export async function PATCH (request: Request) {
+	try {
+	  const body = await request.json();
+
+	  const id = body?.id?.trim();
+	  const status = body?.status?.trim();
+
+
+
+
+	} catch (err) {
+	  if (err instanceof InputException) {
+		  return new ServerResponseBuilder(ResponseType.INVALID_INPUT).build();
+	  }
+	  return new ServerResponseBuilder(ResponseType.UNKNOWN_ERROR).build();
+	}
+}
+
