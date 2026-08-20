@@ -19,7 +19,7 @@
 - [ ] Front-end
   - [ ] Minimum Requirements
     - [x] Dropdown component
-    - [ ] Table component
+    - [x] Table component
     - [ ] Base page [table with data]
     - [ ] Table dropdown interactivity
   - [ ] Main Requirements
