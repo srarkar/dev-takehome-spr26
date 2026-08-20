@@ -18,7 +18,7 @@
     - [ ] Batch deletes
 - [ ] Front-end
   - [ ] Minimum Requirements
-    - [ ] Dropdown component
+    - [x] Dropdown component
     - [ ] Table component
     - [ ] Base page [table with data]
     - [ ] Table dropdown interactivity
