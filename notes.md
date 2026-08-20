@@ -17,11 +17,11 @@
     - [ ] Batch edits
     - [ ] Batch deletes
 - [ ] Front-end
-  - [ ] Minimum Requirements
+  - [x] Minimum Requirements
     - [x] Dropdown component
     - [x] Table component
-    - [ ] Base page [table with data]
-    - [ ] Table dropdown interactivity
+    - [x] Base page [table with data]
+    - [x] Table dropdown interactivity
   - [ ] Main Requirements
     - [ ] Pagination
     - [ ] Tabs
