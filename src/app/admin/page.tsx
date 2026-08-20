@@ -2,48 +2,40 @@
 
 import Button from "@/components/atoms/Button";
 import Input from "@/components/atoms/Input";
-import { useState } from "react";
+
+import { useEffect, useState } from "react";
+import Table, { ItemRequest } from "@/components/tables/Table";
+import { DropdownStatus } from "@/components/atoms/Dropdown";
 
 /**
  * Legacy front-end code from Crisis Corner's previous admin page!
  */
 export default function ItemRequestsPage() {
-  const [item, setItem] = useState<string>("");
-  const [itemList, setItemList] = useState<string[]>([]);
+  const [requests, setRequests] = useState<ItemRequest[]>([]);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
+  
+  const fetchRequests = async () => {
+    try {
+      setError(null);
+      const response = await fetch("/api/requests");
 
-  const handleAddItem = (): void => {
-    if (item.trim()) {
-      setItemList((prevList) => [...prevList, item.trim()]);
-      setItem("");
+      if (!response.ok) {
+        throw new Error("Failed to fetch requests");
+      }
+
+      const data = await response.json();
+
+      if (Array.isArray(data)) {
+        setRequests(data);
+      } else if (data && Array.isArray(data.data)) {
+        setRequests(data.data);
+      } else {
+        setRequests([]);
+      }
+    } catch (err) {
+      setError("Loading item requests failed.");
+      setRequests([]);
+    } finally {
     }
-  };
-
-  return (
-    <div className="max-w-md mx-auto mt-8 flex flex-col items-center gap-6">
-      <h2 className="font-bold">Approve Items</h2>
-
-      <div className="flex flex-col w-full gap-4">
-        <Input
-          type="text"
-          placeholder="Type an item"
-          value={item}
-          onChange={(e) => setItem(e.target.value)}
-          label="Item"
-        />
-        <Button onClick={handleAddItem}>Approve</Button>
-      </div>
-      <div className="flex flex-col gap-3">
-        <h3 className="underline">Currently approved items:</h3>
-        {itemList.length > 0 ? (
-          <ul className="list-disc pl-5">
-            {itemList.map((listItem, index) => (
-              <li key={index}>{listItem}</li>
-            ))}
-          </ul>
-        ) : (
-          "None :("
-        )}
-      </div>
-    </div>
-  );
 }
