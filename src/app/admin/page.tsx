@@ -37,5 +37,58 @@ export default function ItemRequestsPage() {
       setError("Loading item requests failed.");
       setRequests([]);
     } finally {
+      setLoading(false);
     }
+
+    useEffect(() => { fetchRequests(); }, []);
+
+    // update backend status
+    const handleStatusUpdate = async(id: string, newStatus: DropdownStatus) => {
+      if (!id) return;
+
+      const prevRequests = [...requests];
+      
+      setRequests((prevRequests) =>
+      prevRequests.map((item) => {
+        const itemId = item._id ?? item.id;
+
+        if (itemId === id) {
+          return { ...item, status: newStatus };
+        }
+
+        return item;
+        })
+      );
+
+      try {
+        const response = await fetch("/api/requests", {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json", },
+          body: JSON.stringify({ id, status: newStatus, }),
+        });
+        
+        if (!response.ok) {
+          throw new Error("PATCH failed");
+        }
+      } catch (err: unknown) {
+        setRequests(prevRequests); // go back to old state if error
+      }
+    };
+    return (
+    <div className="max-w-4xl mx-auto mt-8 flex flex-col items-center gap-6 px-4">
+      <h2 className="text-2xl font-bold text-gray-900">Item Requests</h2>
+
+      {error && (
+        <div className="w-full p-3 text-sm text-red-600 bg-red-50 rounded-md border border-red-200">
+          {error}
+        </div>
+      )}
+
+      {loading ? (
+        <p className="text-sm text-gray-500">Loading requests...</p>
+      ) : (
+        <Table data={requests} onStatusChange={handleStatusChange} />
+      )}
+    </div>
+  );
 }
